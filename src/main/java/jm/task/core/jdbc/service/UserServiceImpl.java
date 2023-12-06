@@ -21,15 +21,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveUser(String name, String lastName, byte age) throws SQLException {
+    public void saveUser(String name, String lastName, byte age) {
         userDaoJDBC.saveUser(name, lastName, age);
-
     }
 
     @Override
     public void removeUserById(long id) {
         userDaoJDBC.removeUserById(id);
-
     }
 
     @Override

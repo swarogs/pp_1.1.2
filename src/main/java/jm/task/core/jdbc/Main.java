@@ -1,6 +1,5 @@
 package jm.task.core.jdbc;
 
-import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.service.UserServiceImpl;
 
 import java.sql.SQLException;
@@ -14,9 +13,8 @@ public class Main {
         userService.saveUser("Егор", "Мелузов", (byte) 20);
         userService.saveUser("Ваня", "Брусницын", (byte) 35);
         userService.getAllUsers();
-
+        userService.removeUserById(4);
         userService.cleanUsersTable();
-
         userService.dropUsersTable();
     }
 }

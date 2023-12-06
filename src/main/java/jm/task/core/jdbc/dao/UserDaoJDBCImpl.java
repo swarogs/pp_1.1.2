@@ -3,119 +3,90 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 public class UserDaoJDBCImpl extends Util implements UserDao {
 
-    Connection connection = getConnect();
+    private final Connection connection;
     Logger logger = Logger.getLogger("Логирование");
 
     public UserDaoJDBCImpl() {
+        connection = new Util().getConnection();
 
     }
 
     @Override
     public void createUsersTable() {
-        String sql = "CREATE TABLE `mydb`.`users` (\n" +
-                "  `id` INT NOT NULL AUTO_INCREMENT,\n" +
-                "  `name` VARCHAR(45) NULL,\n" +
-                "  `lastName` VARCHAR(45) NULL,\n" +
-                "  `age` TINYINT NULL,\n" +
-                "  PRIMARY KEY (`id`))";
-        try (Connection connection = Util.getConnect();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)
-        ) {
-            preparedStatement.executeUpdate();
-            logger.info("Таблица Создана");
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS users" +
+                    "(id BIGINT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255), last_name VARCHAR(255), age INT)");
+            System.out.println("Таблица создана");
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error creating users: " + e.getMessage());
         }
-
     }
 
     @Override
     public void dropUsersTable() {
-        String sql = "DROP TABLE IF EXISTS users";
-        try (Connection connection = Util.getConnect();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)
-        ) {
-            preparedStatement.executeUpdate();
-            logger.info("Таблица удалена");
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate("DROP TABLE IF EXISTS users");
+            System.out.println("Таблица Сброшена");
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error dropusers Table: " + e.getMessage());
         }
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        String sql = "INSERT INTO USERS(name, lastName,age) VALUES (?,?,?)";
-
-        try (Connection connection = Util.getConnect();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        ) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users (name, last_name, age) VALUES (?, ?, ?)")) {
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setByte(3, age);
-            logger.info("Пользователь сохранен");
             preparedStatement.executeUpdate();
+            System.out.println("Пользователь сохранен");
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error save user : " + e.getMessage());
         }
     }
 
     @Override
     public void removeUserById(long id) {
-        String sql = "Delete From users WHERE id = ?";
-        try (Connection connection = Util.getConnect();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)
-        ) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM users WHERE id = ?")) {
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
-            logger.info("Пользователь удален");
+            System.out.println("Пользователь удален");
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error remove user : " + e.getMessage());
         }
-
     }
 
     @Override
     public List<User> getAllUsers() {
-        List<User> list = new ArrayList<>();
-        String sql = "Select * From users";
-        try (Connection connection = Util.getConnect();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)
-        ) {
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                long id = resultSet.getLong("id");
-                String name = resultSet.getString("name");
-                String lastname = resultSet.getString("lastname");
-                byte age = resultSet.getByte("age");
-                User users = new User(id, name, lastname, age);
-                list.add(users);
+        List<User> users = new ArrayList<>();
+
+        try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM users")) {
+            while(resultSet.next()) {
+                User user = new User(resultSet.getString("name"),
+                        resultSet.getString("last_name"), resultSet.getByte("age"));
+                user.setId(resultSet.getLong("id"));
+                users.add(user);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error get all user : " + e.getMessage());
         }
-        return list;
+
+        return users;
     }
 
     @Override
     public void cleanUsersTable() {
-        String sql = "TRUNCATE TABLE users";
-        try (Connection connection = Util.getConnect();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)
-        ) {
-            preparedStatement.executeUpdate();
-            logger.info("Таблица очищена");
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate("TRUNCATE TABLE users");
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error Cleantable : " + e.getMessage());
         }
     }
 }

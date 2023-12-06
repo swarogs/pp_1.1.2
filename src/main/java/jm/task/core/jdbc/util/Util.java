@@ -9,14 +9,13 @@ public class Util {
     private static final String DB_USERNAME = "root";
     private static final String DB_PASSWORD = "1234";
 
-    public static Connection getConnect() {
-        Connection connection = null;
+    public Connection getConnection() {
+        Connection connection ;
         try {
             connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
         return connection;
     }
 }
