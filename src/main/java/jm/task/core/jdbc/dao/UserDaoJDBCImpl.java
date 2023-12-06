@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 public class UserDaoJDBCImpl extends Util implements UserDao {
 
     private final Connection connection;
-    Logger logger = Logger.getLogger("Логирование");
 
     public UserDaoJDBCImpl() {
         connection = new Util().getConnection();
