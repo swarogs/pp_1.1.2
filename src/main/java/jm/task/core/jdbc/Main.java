@@ -13,6 +13,8 @@ public class Main {
         userService.saveUser("Лиза", "Иванова", (byte) 23);
         userService.saveUser("Егор", "Мелузов", (byte) 20);
         userService.saveUser("Ваня", "Брусницын", (byte) 35);
+
+        //todo: не реализовано удаление User по id
         userService.getAllUsers();
 
         userService.cleanUsersTable();

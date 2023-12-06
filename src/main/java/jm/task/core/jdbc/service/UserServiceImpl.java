@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class UserServiceImpl implements UserService {
+
     private final UserDao userDaoJDBC = new UserDaoJDBCImpl();
 
     @Override
@@ -21,15 +22,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveUser(String name, String lastName, byte age) throws SQLException {
+    public void saveUser(String name, String lastName, byte age) {//todo: throws SQLException .. лишнее. CodeStyle, пробелы - лишние стоки в методах
         userDaoJDBC.saveUser(name, lastName, age);
-
     }
 
     @Override
     public void removeUserById(long id) {
         userDaoJDBC.removeUserById(id);
-
     }
 
     @Override

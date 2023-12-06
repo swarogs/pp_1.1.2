@@ -12,26 +12,27 @@ import java.util.List;
 
 public class UserDaoJDBCImpl extends Util implements UserDao {
 
-    Connection connection = getConnect();
+    //todo: implement - должны отрабатывать тесты
 
-    public UserDaoJDBCImpl() {
+    private final Connection connection;
 
+    String createUsersQuery = "CREATE TABLE `mydb`.`users` (\n" +//todo: выносим переменные из методов
+            "  `id` INT NOT NULL AUTO_INCREMENT,\n" +//todo: добавить IF NOT EXISTS..
+            "  `name` VARCHAR(45) NULL,\n" +
+            "  `lastName` VARCHAR(45) NULL,\n" +
+            "  `age` TINYINT NULL,\n" +
+            "  PRIMARY KEY (`id`))";
+
+    public UserDaoJDBCImpl() {//todo: инициализация - через конструктор
+        connection = new Util().getConnection();//todo: codeStyle наименование переменной
     }
 
     @Override
-    public void createUsersTable() {
-        String sql = "CREATE TABLE `mydb`.`users` (\n" +
-                "  `id` INT NOT NULL AUTO_INCREMENT,\n" +
-                "  `name` VARCHAR(45) NULL,\n" +
-                "  `lastName` VARCHAR(45) NULL,\n" +
-                "  `age` TINYINT NULL,\n" +
-                "  PRIMARY KEY (`id`))";
-        try (Connection connection = Util.getConnect();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)
-        ) {
+    public void createUsersTable() {//todo: codeStyle, ОБРАЗЕЦ:
+        try (PreparedStatement preparedStatement = connection.prepareStatement(createUsersQuery)) {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error creating users: " + e.getMessage());//todo: throw exception в случае - когда дальнейшая работа приложения не имеет смысла..
         }
 
     }
@@ -39,7 +40,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
     @Override
     public void dropUsersTable() {
         String sql = "drop table users";
-        try (Connection connection = Util.getConnect();
+        try (Connection connection = Util.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)
         ) {
             preparedStatement.executeUpdate();
@@ -52,7 +53,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
     public void saveUser(String name, String lastName, byte age) {
         String sql = "INSERT INTO USERS(name, lastName,age) VALUES (?,?,?)";
 
-        try (Connection connection = Util.getConnect();
+        try (Connection connection = Util.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql);
         ) {
             preparedStatement.setString(1, name);
@@ -68,7 +69,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
     @Override
     public void removeUserById(long id) {
         String sql = "Delete From User id = ?";
-        try (Connection connection = Util.getConnect();
+        try (Connection connection = Util.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)
         ) {
             preparedStatement.setLong(1, id);
@@ -83,7 +84,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
     public List<User> getAllUsers() {
         List<User> list = new ArrayList<>();
         String sql = "Select * From users";
-        try (Connection connection = Util.getConnect();
+        try (Connection connection = Util.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)
         ) {
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -106,7 +107,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
     @Override
     public void cleanUsersTable() {
         String sql = "TRUNCATE TABLE users";
-        try (Connection connection = Util.getConnect();
+        try (Connection connection = Util.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)
         ) {
             preparedStatement.executeUpdate();
