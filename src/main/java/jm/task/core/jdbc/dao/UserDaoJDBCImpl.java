@@ -6,7 +6,6 @@ import jm.task.core.jdbc.util.Util;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class UserDaoJDBCImpl extends Util implements UserDao {
 
@@ -67,7 +66,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
         List<User> users = new ArrayList<>();
 
         try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM users")) {
-            while(resultSet.next()) {
+            while (resultSet.next()) {
                 User user = new User(resultSet.getString("name"),
                         resultSet.getString("last_name"), resultSet.getByte("age"));
                 user.setId(resultSet.getLong("id"));
