@@ -9,19 +9,21 @@ import java.util.List;
 
 public class UserDaoJDBCImpl extends Util implements UserDao {
 
+    private static final String createUsersQuery = "CREATE TABLE IF NOT EXISTS users" +
+            "(id BIGINT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255), last_name VARCHAR(255), age INT)";//todo: codeStyle ..проговаривали (для остальных методов также)
+
     private final Connection connection;
 
     public UserDaoJDBCImpl() {
         connection = new Util().getConnection();
-
+        //todo: codeStyle пустые строки не нужны, состояние кода = уровень разрвботчика
     }
 
     @Override
     public void createUsersTable() {
         try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS users" +
-                    "(id BIGINT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255), last_name VARCHAR(255), age INT)");
-            System.out.println("Таблица создана");
+            statement.executeUpdate(createUsersQuery);
+//            System.out.println("Таблица создана");//todo: все логи -> в слой service (здесь и далее)
         } catch (SQLException e) {
             throw new RuntimeException("Error creating users: " + e.getMessage());
         }
@@ -75,7 +77,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
         } catch (SQLException e) {
             throw new RuntimeException("Error get all user : " + e.getMessage());
         }
-
+        //todo: codeStyle пустые строки не нужны
         return users;
     }
 
